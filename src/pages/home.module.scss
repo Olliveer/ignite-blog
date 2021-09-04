@@ -1,1 +1,57 @@
-// TODO
+.contentContainer {
+  width: 700px;
+  height: 108px;
+
+  margin: 4rem auto 3rem;
+
+  section {
+    h1 {
+      font-weight: 700;
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--heading);
+      line-height: 2rem;
+    }
+
+    p {
+      font-weight: 400;
+      font-size: 1.125rem;
+      color: var(--body);
+      line-height: 1.361rem;
+    }
+
+    div {
+      // width: 263px;
+      margin-top: 1.5rem;
+
+      display: flex;
+      align-items: center;
+
+      time,
+      span {
+        font-weight: 400;
+        font-size: 0.875rem;
+        color: var(--info);
+        line-height: 16.94px;
+        margin-right: 1.5rem;
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+        margin-right: 0.5rem;
+      }
+    }
+
+    & + section {
+      margin-top: 3rem;
+    }
+  }
+
+  button {
+    border: 0;
+    background: transparent;
+    color: var(--highlight);
+    margin-top: 4rem;
+  }
+}
