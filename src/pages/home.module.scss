@@ -5,6 +5,15 @@
   margin: 4rem auto 3rem;
 
   section {
+    a {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+        color: var(--highlight);
+      }
+    }
+
     h1 {
       font-weight: 700;
       font-size: 1.75rem;
@@ -18,29 +27,6 @@
       font-size: 1.125rem;
       color: var(--body);
       line-height: 1.361rem;
-    }
-
-    div {
-      // width: 263px;
-      margin-top: 1.5rem;
-
-      display: flex;
-      align-items: center;
-
-      time,
-      span {
-        font-weight: 400;
-        font-size: 0.875rem;
-        color: var(--info);
-        line-height: 16.94px;
-        margin-right: 1.5rem;
-      }
-
-      svg {
-        width: 20px;
-        height: 20px;
-        margin-right: 0.5rem;
-      }
     }
 
     & + section {
