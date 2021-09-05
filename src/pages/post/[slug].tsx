@@ -1,19 +1,22 @@
+import React from 'react';
 import Prismic from '@prismicio/client';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { useRouter } from 'next/router';
-import PrismicDOM, { RichText } from 'prismic-dom';
-import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
+import { RichText } from 'prismic-dom';
+import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 import Header from '../../components/Header';
 import { getPrismicClient } from '../../services/prismic';
-import styles from './post.module.scss';
 import commonStyles from '../../styles/common.module.scss';
+import styles from './post.module.scss';
 
 interface Post {
   first_publication_date: string | null;
+  uid: string;
   data: {
     title: string;
+    subtitle: string;
     banner: {
       url: string;
     };
@@ -35,13 +38,13 @@ export default function Post({ post }: PostProps): JSX.Element {
   const router = useRouter();
 
   if (router.isFallback) {
-    return <div style={{ margin: 'auto auto' }}>Loading...</div>;
+    return <div style={{ margin: 'auto auto' }}>Carregando...</div>;
   }
 
   const readTime = post.data.content.reduce((total, content) => {
     const bodyWords = RichText.asText(content.body).split(' ').length;
 
-    return Math.round(total + bodyWords / 200);
+    return total + bodyWords;
   }, 0);
 
   return (
@@ -54,24 +57,26 @@ export default function Post({ post }: PostProps): JSX.Element {
           <h1>{post.data.title}</h1>
           <div className={commonStyles.containerAuthor}>
             <FiCalendar />
-            <time>{post.first_publication_date}</time>
+            <time>
+              {format(parseISO(post.first_publication_date), 'dd MMM yyyy', {
+                locale: ptBR,
+              })}
+            </time>
             <FiUser /> <span>{post.data.author}</span>
             <FiClock />
-            <span>{readTime <= 1 ? '1 min' : `${readTime} mins`}</span>
+            <span>{Math.ceil(readTime / 200)} min</span>
           </div>
 
           {post.data.content.map(content => (
-            <>
+            <article key={`${content.heading}`}>
               <h1 className={styles.headinContent}>{content.heading}</h1>
               <div
                 className={styles.content}
-                key={content.heading}
-                // eslint-disable-next-line react/no-danger
                 dangerouslySetInnerHTML={{
-                  __html: PrismicDOM.RichText.asHtml(content.body),
+                  __html: RichText.asHtml(content.body),
                 }}
               />
-            </>
+            </article>
           ))}
         </section>
       </main>
@@ -104,13 +109,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const response = await prismic.getByUID('posts', String(slug), {});
 
   const post = {
-    first_publication_date: format(
-      parseISO(response.first_publication_date),
-      'dd MMM yyyy',
-      { locale: ptBR }
-    ),
+    first_publication_date: response.first_publication_date,
+    uid: response.uid,
     data: {
-      title: RichText.asText(response.data.title),
+      title: response.data.title,
+      subtitle: response.data.subtitle,
       banner: {
         url: response.data.banner.url,
       },

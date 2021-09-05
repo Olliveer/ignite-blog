@@ -4,13 +4,12 @@ import { ptBR } from 'date-fns/locale';
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { RichText } from 'prismic-dom';
 import { useState } from 'react';
 import { FiCalendar, FiUser } from 'react-icons/fi';
 import Header from '../components/Header';
 import { getPrismicClient } from '../services/prismic';
-import styles from './home.module.scss';
 import commonStyles from '../styles/common.module.scss';
+import styles from './home.module.scss';
 import Post from './post/[slug]';
 
 interface Post {
@@ -26,7 +25,6 @@ interface Post {
 interface PostPagination {
   next_page: string;
   results: Post[];
-  total_results_size: number;
 }
 
 interface HomeProps {
@@ -60,7 +58,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
           <section key={post.uid}>
             <Link href={`/post/${post.uid}`}>
               <a>
-                <h1>{RichText.asText(post.data.title)}</h1>
+                <h1>{post.data.title}</h1>
               </a>
             </Link>
             <p>{post.data.subtitle}</p>
@@ -76,15 +74,11 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </div>
           </section>
         ))}
-        <button
-          disabled={posts.length === postsPagination.total_results_size}
-          onClick={loadPosts}
-          type="button"
-        >
-          {posts.length < postsPagination.total_results_size
-            ? 'Carregar mais posts'
-            : 'No more posts...'}
-        </button>
+        {page && (
+          <button onClick={loadPosts} type="button">
+            Carregar mais posts
+          </button>
+        )}
       </main>
     </>
   );
@@ -96,7 +90,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
-      fetch: ['posts.content', 'posts.title', 'posts.subtitle', 'posts.author'],
+      fetch: [],
       pageSize: 1,
     }
   );
@@ -118,7 +112,6 @@ export const getStaticProps: GetStaticProps = async () => {
       postsPagination: {
         next_page: postsResponse.next_page,
         results: posts,
-        total_results_size: postsResponse.total_results_size,
       },
     },
   };
